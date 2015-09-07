@@ -31,7 +31,7 @@ describe UserAgentParser::Parser do
   end
 
   def self.file_to_yaml(resource)
-    test_resource_path = File.expand_path('../../vendor/ua-parser/test_resources', __FILE__)
+    test_resource_path = File.expand_path('../../vendor/uap-core/test_resources', __FILE__)
     resource_path = File.join(test_resource_path, resource)
     YAML.load_file(resource_path)
   end
