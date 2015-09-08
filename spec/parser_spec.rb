@@ -42,12 +42,7 @@ describe UserAgentParser::Parser do
   end
 
   def self.operating_system_test_cases
-    file_to_test_cases("test_user_agent_parser_os.yaml") +
     file_to_test_cases("additional_os_tests.yaml")
-  end
-
-  def self.device_test_cases
-    file_to_test_cases("test_device.yaml")
   end
 
   def custom_patterns_path
@@ -130,17 +125,6 @@ describe UserAgentParser::Parser do
 
         if test_case['patch_minor']
           operating_system.version.patch_minor.must_equal_test_case_property(test_case, 'patch_minor')
-        end
-      end
-    end
-
-    device_test_cases.each do |test_case|
-      it "parses device for #{test_case_to_test_name(test_case)}" do
-        user_agent = PARSER.parse(test_case['user_agent_string'])
-        device = user_agent.device
-
-        if test_case['family']
-          device.family.must_equal_test_case_property(test_case, 'family')
         end
       end
     end
