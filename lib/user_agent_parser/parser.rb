@@ -7,13 +7,20 @@ module UserAgentParser
 
     def initialize(options={})
       @patterns_path = options[:patterns_path] || UserAgentParser::DefaultPatternsPath
+      @cache_max_keys = options[:cache_max_keys]
       @ua_patterns, @os_patterns, @device_patterns = load_patterns(patterns_path)
     end
 
+    def cache
+      @cache ||= ::UserAgentParser::Cache.new(max_keys: @cache_max_keys)
+    end
+
     def parse(user_agent)
-      os = parse_os(user_agent)
-      device = parse_device(user_agent)
-      parse_ua(user_agent, os, device)
+      cache.fetch(user_agent) do
+        os = parse_os(user_agent)
+        device = parse_device(user_agent)
+        parse_ua(user_agent, os, device)
+      end
     end
 
   private
@@ -62,12 +69,9 @@ module UserAgentParser
     end
 
     def first_pattern_match(patterns, value)
-      patterns.each do |pattern|
-        if match = pattern["regex"].match(value)
-          return [pattern, match]
-        end
+      if pattern = patterns.detect { |pattern| pattern["regex"].match?(value) }
+        [pattern, pattern["regex"].match(value)]
       end
-      nil
     end
 
     def user_agent_from_pattern_match(pattern, match, os = nil, device = nil)
